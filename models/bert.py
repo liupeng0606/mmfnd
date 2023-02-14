@@ -26,7 +26,6 @@ class BertClf(nn.Module):
         self.enc = BertEncoder(args)
         self.clf = nn.Linear(args.hidden_sz, args.n_classes)
         self.clf.apply(self.enc.bert.init_bert_weights)
-
     def forward(self, txt, mask, segment):
         x = self.enc(txt, mask, segment)
         return self.clf(x)
