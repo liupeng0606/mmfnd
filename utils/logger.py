@@ -3,7 +3,6 @@ import logging
 import time
 from datetime import timedelta
 
-
 class LogFormatter:
     def __init__(self):
         self.start_time = time.time()
