@@ -94,5 +94,4 @@ class JsonlDataset(Dataset):
             segment += 1
 
         
-
         return sentence, segment, image, label, self.data[index]["cap"], self.data[index]["text"]
