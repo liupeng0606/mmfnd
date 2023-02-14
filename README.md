@@ -5,8 +5,7 @@
 
 ## Dataset
 
-
-You need to download the original datasets from the following links to obtain image files.
+download the datasets
 
 Fakeddit: [https://github.com/entitize/Fakeddit](https://github.com/entitize/Fakeddit)
 
