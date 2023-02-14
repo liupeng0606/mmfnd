@@ -1,4 +1,3 @@
-
 from models.bert import BertClf
 from models.image import ImageClf
 from models.multi_model import MultimodalBertClf
