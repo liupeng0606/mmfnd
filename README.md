@@ -20,7 +20,7 @@ python features_gen.py --dataset_dir ./data/weibo/ --image_dir ${weibo_image_dir
 python features_gen.py --dataset_dir ./data/fakeddit/ --image_dir ${fakeddit_image_dir} --feature_dir ./data/fakeddit/
 ```
 
-## Running
+## Train model
 
 ### (1) train model
 
