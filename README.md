@@ -5,13 +5,15 @@
 
 ## Dataset
 
-download the datasets
+Download the datasets
 
 Fakeddit: [https://github.com/entitize/Fakeddit](https://github.com/entitize/Fakeddit)
 
 Weibo: [https://github.com/yaqingwang/EANN-KDD18](https://github.com/yaqingwang/EANN-KDD18)
 
 ### (2) Extract images features
+
+Generate the features for images
 
 ```shell script
 python features_gen.py --dataset_dir ./data/weibo/ --image_dir ${weibo_image_dir} --feature_dir ./data/weibo/
