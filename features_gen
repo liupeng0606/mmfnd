@@ -26,7 +26,6 @@ def extract_global_visual_feature(args):
     modules = list(resnet.children())[0:-2]
     resnet = nn.Sequential(*modules).cuda()
     resnet.eval()
-
     resnet_image_transforms = transforms.Compose(
         [
             transforms.Resize([224, 224]),
