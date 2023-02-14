@@ -44,7 +44,6 @@ class ImageClf(nn.Module):
         self.args = args
         self.img_encoder = ImageEncoder(args)
         self.clf = nn.Linear(args.img_hidden_sz * args.num_image_embeds, args.n_classes)
-
     def forward(self, x):
         x = self.img_encoder(x)
         x = torch.flatten(x, start_dim=1)
