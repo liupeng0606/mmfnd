@@ -7,9 +7,9 @@
 
 Download the datasets
 
-Fakeddit: [https://github.com/entitize/Fakeddit](https://github.com/entitize/Fakeddit)
+The Datasets of Fakeddit: [https://github.com/entitize/Fakeddit](https://github.com/entitize/Fakeddit)
 
-Weibo: [https://github.com/yaqingwang/EANN-KDD18](https://github.com/yaqingwang/EANN-KDD18)
+The Datasets of Weibo: [https://github.com/yaqingwang/EANN-KDD18](https://github.com/yaqingwang/EANN-KDD18)
 
 ### (2) Extract images features
 
