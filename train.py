@@ -27,7 +27,7 @@ def get_args(parser):
     parser.add_argument("--gradient_accumulation_steps", type=int, default=24)
     parser.add_argument("--hidden", nargs="*", type=int, default=[])
     parser.add_argument("--hidden_sz", type=int, default=768)
-    parser.add_argument("--img_embed_pool_type", type=str, default="avg", choices=["max", "avg"])
+    parser.add_argument("--img_embed_pool_type", type=str, default="avg")
     parser.add_argument("--img_hidden_sz", type=int, default=2048)
     parser.add_argument("--include_bn", type=int, default=True)
     parser.add_argument("--lr", type=float, default=1e-4)
@@ -35,7 +35,7 @@ def get_args(parser):
     parser.add_argument("--lr_patience", type=int, default=2)
     parser.add_argument("--max_epochs", type=int, default=100)
     parser.add_argument("--max_seq_len", type=int, default=512)
-    parser.add_argument("--model", type=str, default="mmbt_drop")
+    parser.add_argument("--model", type=str, default="multi_model")
     parser.add_argument("--n_workers", type=int, default=12)
     parser.add_argument("--name", type=str, default="nameless")
     parser.add_argument("--num_image_embeds", type=int, default=1)
@@ -178,7 +178,7 @@ def model_forward(i_epoch, model, args, criterion, batch):
     freeze_txt = i_epoch < args.freeze_txt
 
     
-    assert args.model == "mmbt_drop"
+    assert args.model == "multi_model"
     for param in model.enc.img_encoder.parameters():
         param.requires_grad = not freeze_img
     for param in model.enc.encoder.parameters():
