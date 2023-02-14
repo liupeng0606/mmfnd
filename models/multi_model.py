@@ -6,7 +6,6 @@ from transformers import BertTokenizer, BertModel
 
 from models.image import ImageEncoder
 
-
 class ImageBertEmbeddings(nn.Module):
     def __init__(self, args, embeddings):
         super(ImageBertEmbeddings, self).__init__()
