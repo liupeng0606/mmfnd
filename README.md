@@ -1,7 +1,4 @@
 
-# Public source code of Multi-modal fake news detection via bridging the gap between modals
-
-
 
 ## Dataset
 
