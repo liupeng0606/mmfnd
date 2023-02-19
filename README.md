@@ -19,7 +19,7 @@ python features_gen.py --dataset_dir ./data/fakeddit/ --image_dir ${fakeddit_ima
 
 ## Train model
 
-### (1) train model
+### train model
 
 ```shell script
 python train.py --task {task_name} --batch_sz 32 --gradient_accumulation_steps 24 --max_epochs 20 --bert_model {bert-base-uncased}
