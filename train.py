@@ -22,8 +22,6 @@ def get_args(parser):
     parser.add_argument("--drop_img_percent", type=float, default=0.0)
     parser.add_argument("--dropout", type=float, default=0.1)
     parser.add_argument("--embed_sz", type=int, default=300)
-    parser.add_argument("--freeze_img", type=int, default=0)
-    parser.add_argument("--freeze_txt", type=int, default=0)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=24)
     parser.add_argument("--hidden", nargs="*", type=int, default=[])
     parser.add_argument("--hidden_sz", type=int, default=768)
@@ -80,7 +78,7 @@ class SCELoss(nn.Module):
 
 
 def get_criterion(args):
-    if args.task_type == "multilabel":
+    if args.task_type == "classification":
         if args.weight_classes:
             freqs = [args.label_freqs[l] for l in args.labels]
             label_weights = (torch.FloatTensor(freqs) / args.train_data_len) ** -1
@@ -94,7 +92,7 @@ def get_criterion(args):
 
 
 def get_optimizer(model, args):
-    if args.model in ["bert", "concatbert", "mmbt"]:
+    if args.model in ["bert", "mmbt"]:
         total_steps = (
             args.train_data_len
             / args.batch_sz
@@ -133,11 +131,9 @@ def model_eval(i_epoch, data, model, args, criterion, store_preds=False):
             loss, out, tgt = model_forward(i_epoch, model, args, criterion, batch)
             losses.append(loss.item())
 
-            if args.task_type == "multilabel":
-                pred = torch.sigmoid(out).cpu().detach().numpy() > 0.5
-            else:
-                pred = torch.nn.functional.softmax(out, dim=1).argmax(dim=1).cpu().detach().numpy()
-                pred_x = torch.nn.functional.softmax(out, dim=1).argmax(dim=1).cpu().detach().tolist()
+            
+             pred = torch.nn.functional.softmax(out, dim=1).argmax(dim=1).cpu().detach().numpy()
+             pred_x = torch.nn.functional.softmax(out, dim=1).argmax(dim=1).cpu().detach().tolist()
 
 
             preds.append(pred)
@@ -152,15 +148,10 @@ def model_eval(i_epoch, data, model, args, criterion, store_preds=False):
     metrics["precision_score"] = precision_score(mytgts,mypreds)
     metrics["recall_score"] = recall_score(mytgts,mypreds)
     metrics["sk_acc"] = accuracy_score(mytgts,mypreds)
-    if args.task_type == "multilabel":
-        tgts = np.vstack(tgts)
-        preds = np.vstack(preds)
-        metrics["macro_f1"] = f1_score(tgts, preds, average="macro")
-        metrics["micro_f1"] = f1_score(tgts, preds, average="micro")
-    else:
-        tgts = [l for sl in tgts for l in sl]
-        preds = [l for sl in preds for l in sl]
-        metrics["acc"] = accuracy_score(tgts, preds)
+    
+    tgts = [l for sl in tgts for l in sl]
+    preds = [l for sl in preds for l in sl]
+    metrics["acc"] = accuracy_score(tgts, preds)
 
     if store_preds:
         store_preds_to_disk(tgts, preds, args)
@@ -174,11 +165,7 @@ def model_eval(i_epoch, data, model, args, criterion, store_preds=False):
 def model_forward(i_epoch, model, args, criterion, batch):
     txt, segment, mask, img, tgt = batch
 
-    freeze_img = i_epoch < args.freeze_img
-    freeze_txt = i_epoch < args.freeze_txt
 
-    
-    assert args.model == "multi_model"
     for param in model.enc.img_encoder.parameters():
         param.requires_grad = not freeze_img
     for param in model.enc.encoder.parameters():
@@ -209,12 +196,6 @@ def train(args):
     os.makedirs(args.savedir, exist_ok=True)
 
     train_loader, val_loader, test_loaders = get_data_loaders(args)
-
-
-
-
-    
-
     model = get_model(args)
     criterion = get_criterion(args)
     optimizer = get_optimizer(model, args)
@@ -262,9 +243,7 @@ def train(args):
         logger.info("Train Loss: {:.4f}".format(np.mean(train_losses)))
         log_metrics("Val", metrics, args, logger)
 
-        tuning_metric = (
-            metrics["micro_f1"] if args.task_type == "multilabel" else metrics["acc"]
-        )
+        
 
         # for test_name, test_loader in test_loaders:
         #     test_metrics = model_eval(np.inf, test_loader, model, args, criterion, store_preds=True)
@@ -294,17 +273,17 @@ def train(args):
             args.savedir,
         )
 
-        # if n_no_improve >= args.patience:
-        #     logger.info("No improvement. Breaking out of loop.")
-        #     break
+        if n_no_improve >= args.patience:
+            logger.info("No improvement. Breaking out of loop.")
+            break
 
-    # load_checkpoint(model, os.path.join(args.savedir, "model_best.pt"))
-    # model.eval()
-    # for test_name, test_loader in test_loaders.items():
-    #     test_metrics = model_eval(
-    #         np.inf, test_loader, model, args, criterion, store_preds=True
-    #     )
-    #     log_metrics(f"Test - {test_name}", test_metrics, args, logger)
+    load_checkpoint(model, os.path.join(args.savedir, "model_best.pt"))
+    model.eval()
+    for test_name, test_loader in test_loaders.items():
+        test_metrics = model_eval(
+            np.inf, test_loader, model, args, criterion, store_preds=True
+        )
+        log_metrics(f"Test - {test_name}", test_metrics, args, logger)
 
 
 def cli_main():
